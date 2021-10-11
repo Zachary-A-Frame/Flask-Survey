@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from surveys import satisfaction_survey
 
@@ -23,5 +23,23 @@ def generate_home():
 def render_questions(question_id):
 
     rendered_question = satisfaction_survey.questions[question_id]
+    questions_length = len(satisfaction_survey.questions)
 
-    return render_template('questions.html', question=rendered_question)
+
+
+    return render_template('questions.html', question=rendered_question, questions_len=questions_length)
+
+@app.route("/answer", methods=["POST"])
+def add_response():
+    choice = request.form['answer']
+    responses.append(choice)
+
+    if (len(responses) == len(satisfaction_survey.questions)):
+        return redirect("/complete")
+    else:
+        return redirect(f"questions/{len(responses)}")
+
+
+@app.route("/complete")
+def complete():
+    return render_template("complete.html")
